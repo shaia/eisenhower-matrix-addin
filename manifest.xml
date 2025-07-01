@@ -10,8 +10,8 @@
   <Version>1.0.0.0</Version>
   <ProviderName>Open Source Productivity Tools</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Eisenhower Matrix for Outlook"/>
-  <Description DefaultValue="Free productivity tool to organize emails and tasks using the Eisenhower Matrix. Categorize items by urgency and importance to boost your productivity."/>
+  <DisplayName DefaultValue="Eisenhower Matrix"/>
+  <Description DefaultValue="Organize emails using the Eisenhower Matrix"/>
   <IconUrl DefaultValue="https://shaia.github.io/eisenhower-matrix-addin/icons/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://shaia.github.io/eisenhower-matrix-addin/icons/icon-128.png"/>
   <SupportUrl DefaultValue="https://github.com/shaia/eisenhower-matrix-addin"/>
@@ -39,7 +39,9 @@
   
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
     <Rule xsi:type="ItemIs" ItemType="Appointment" FormType="Read"/>
+    <Rule xsi:type="ItemIs" ItemType="Appointment" FormType="Edit"/>
   </Rule>
   
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
@@ -51,18 +53,20 @@
     
     <Hosts>
       <Host xsi:type="MailHost">
+        <!-- Desktop Form Factor -->
         <DesktopFormFactor>
           <FunctionFile resid="Commands.Url"/>
           
+          <!-- Message Read Command Surface -->
           <ExtensionPoint xsi:type="MessageReadCommandSurface">
             <OfficeTab id="TabDefault">
-              <Group id="msgReadGroup">
+              <Group id="EisenhowerReadGroup">
                 <Label resid="GroupLabel"/>
-                <Control xsi:type="Button" id="msgReadOpenPaneButton">
-                  <Label resid="TaskpaneButton.Label"/>
+                <Control xsi:type="Button" id="ReadOpenMatrixButton">
+                  <Label resid="ButtonLabel"/>
                   <Supertip>
-                    <Title resid="TaskpaneButton.Label"/>
-                    <Description resid="TaskpaneButton.Tooltip"/>
+                    <Title resid="ButtonLabel"/>
+                    <Description resid="ButtonTooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.16x16"/>
@@ -70,7 +74,30 @@
                     <bt:Image size="80" resid="Icon.80x80"/>
                   </Icon>
                   <Action xsi:type="ShowTaskpane">
-                    <TaskpaneId>ButtonId1</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+          
+          <!-- Message Compose Command Surface -->
+          <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="EisenhowerComposeGroup">
+                <Label resid="GroupLabel"/>
+                <Control xsi:type="Button" id="ComposeOpenMatrixButton">
+                  <Label resid="ButtonLabel"/>
+                  <Supertip>
+                    <Title resid="ButtonLabel"/>
+                    <Description resid="ButtonTooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
                     <SourceLocation resid="Taskpane.Url"/>
                   </Action>
                 </Control>
@@ -93,10 +120,10 @@
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="Eisenhower Matrix"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Open Matrix"/>
+        <bt:String id="ButtonLabel" DefaultValue="Open Matrix"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Open the Eisenhower Matrix to categorize this item"/>
+        <bt:String id="ButtonTooltip" DefaultValue="Open the Eisenhower Matrix to organize your tasks and emails"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
