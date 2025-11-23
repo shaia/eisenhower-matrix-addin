@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+    <script src="../shared/core/matrix-manager.js" type="text/javascript"></script>
+</head>
+<body>
+    <script>
+        /**
+         * Office Add-in Commands File
+         * This file handles function-based commands triggered from the ribbon
+         * Currently, the add-in uses ShowTaskpane actions, so these functions
+         * are optional enhancements for future use
+         */
+
+        Office.onReady(function() {
+            // Add-in commands are ready
+            console.log('Eisenhower Matrix commands loaded');
+        });
+
+        /**
+         * Quick add current email to "Do First" quadrant
+         * Can be called from a ribbon button without opening taskpane
+         */
+        function quickAddDoFirst(event) {
+            try {
+                const item = Office.context.mailbox.item;
+                const emailData = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.displayName : 'Unknown',
+                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : new Date().toLocaleDateString(),
+                    id: item.itemId || item.conversationId || generateId(),
+                    type: item.itemType || 'message'
+                };
+
+                addToQuadrantFromCommand(1, emailData);
+                showNotification('Added to Do First quadrant');
+            } catch (error) {
+                console.error('Error in quickAddDoFirst:', error);
+                showNotification('Error adding item');
+            }
+
+            event.completed();
+        }
+
+        /**
+         * Quick add current email to "Schedule" quadrant
+         */
+        function quickAddSchedule(event) {
+            try {
+                const item = Office.context.mailbox.item;
+                const emailData = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.displayName : 'Unknown',
+                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : new Date().toLocaleDateString(),
+                    id: item.itemId || item.conversationId || generateId(),
+                    type: item.itemType || 'message'
+                };
+
+                addToQuadrantFromCommand(2, emailData);
+                showNotification('Added to Schedule quadrant');
+            } catch (error) {
+                console.error('Error in quickAddSchedule:', error);
+                showNotification('Error adding item');
+            }
+
+            event.completed();
+        }
+
+        /**
+         * Quick add current email to "Delegate" quadrant
+         */
+        function quickAddDelegate(event) {
+            try {
+                const item = Office.context.mailbox.item;
+                const emailData = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.displayName : 'Unknown',
+                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : new Date().toLocaleDateString(),
+                    id: item.itemId || item.conversationId || generateId(),
+                    type: item.itemType || 'message'
+                };
+
+                addToQuadrantFromCommand(3, emailData);
+                showNotification('Added to Delegate quadrant');
+            } catch (error) {
+                console.error('Error in quickAddDelegate:', error);
+                showNotification('Error adding item');
+            }
+
+            event.completed();
+        }
+
+        /**
+         * Quick add current email to "Eliminate" quadrant
+         */
+        function quickAddEliminate(event) {
+            try {
+                const item = Office.context.mailbox.item;
+                const emailData = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.displayName : 'Unknown',
+                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : new Date().toLocaleDateString(),
+                    id: item.itemId || item.conversationId || generateId(),
+                    type: item.itemType || 'message'
+                };
+
+                addToQuadrantFromCommand(4, emailData);
+                showNotification('Added to Eliminate quadrant');
+            } catch (error) {
+                console.error('Error in quickAddEliminate:', error);
+                showNotification('Error adding item');
+            }
+
+            event.completed();
+        }
+
+        /**
+         * Helper function to add email to quadrant from command
+         */
+        function addToQuadrantFromCommand(quadrant, emailData) {
+            // Load existing matrix data
+            let matrixData = loadMatrixData();
+
+            // Remove from all quadrants if exists
+            for (let q = 1; q <= 4; q++) {
+                matrixData[q] = matrixData[q].filter(item => item.id !== emailData.id);
+            }
+
+            // Add to selected quadrant
+            matrixData[quadrant].push({
+                ...emailData,
+                timestamp: Date.now()
+            });
+
+            // Save back
+            saveMatrixData(matrixData);
+        }
+
+        /**
+         * Load matrix data from roaming settings
+         */
+        function loadMatrixData() {
+            try {
+                if (Office.context.roamingSettings) {
+                    const data = Office.context.roamingSettings.get('eisenhowerMatrix');
+                    return data ? JSON.parse(data) : { 1: [], 2: [], 3: [], 4: [] };
+                } else {
+                    const data = localStorage.getItem('eisenhowerMatrix');
+                    return data ? JSON.parse(data) : { 1: [], 2: [], 3: [], 4: [] };
+                }
+            } catch (e) {
+                return { 1: [], 2: [], 3: [], 4: [] };
+            }
+        }
+
+        /**
+         * Save matrix data to roaming settings
+         */
+        function saveMatrixData(data) {
+            try {
+                if (Office.context.roamingSettings) {
+                    Office.context.roamingSettings.set('eisenhowerMatrix', JSON.stringify(data));
+                    Office.context.roamingSettings.saveAsync(function(result) {
+                        if (result.status !== Office.AsyncResultStatus.Succeeded) {
+                            // Fallback to localStorage
+                            localStorage.setItem('eisenhowerMatrix', JSON.stringify(data));
+                        }
+                    });
+                } else {
+                    localStorage.setItem('eisenhowerMatrix', JSON.stringify(data));
+                }
+            } catch (e) {
+                console.error('Error saving matrix data:', e);
+            }
+        }
+
+        /**
+         * Show notification to user
+         */
+        function showNotification(message) {
+            console.log('[Eisenhower Matrix]', message);
+            // Note: Office.context.mailbox.item.notificationMessages requires additional API
+            // For now, just log to console
+        }
+
+        /**
+         * Generate unique ID for items without itemId
+         */
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        /**
+         * Example: Open full matrix in dialog
+         * This could be used if you want a popup instead of task pane
+         */
+        function openMatrixDialog(event) {
+            const dialogUrl = 'https://shaia.github.io/eisenhower-matrix-addin/outlook/taskpane.html';
+
+            Office.context.ui.displayDialogAsync(
+                dialogUrl,
+                { height: 60, width: 40 },
+                function(result) {
+                    if (result.status === Office.AsyncResultStatus.Failed) {
+                        console.error('Dialog failed:', result.error.message);
+                    }
+                }
+            );
+
+            event.completed();
+        }
+    </script>
+</body>
+</html>

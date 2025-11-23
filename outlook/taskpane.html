@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eisenhower Matrix</title>
+
+    <!-- Office.js -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+
+    <!-- Core Matrix Manager -->
+    <script src="../shared/core/matrix-manager.js" type="text/javascript"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../shared/styles/outlook-taskpane.css">
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Eisenhower Matrix</h1>
+        <p>Organize by urgency & importance</p>
+    </div>
+
+    <div id="currentItem" class="current-item" style="display: none;">
+        <h3 id="itemTitle"></h3>
+        <p id="itemSender"></p>
+        <div class="quadrant-buttons">
+            <button class="quadrant-btn btn-q1" onclick="addToQuadrant(1)">🔴 Do First</button>
+            <button class="quadrant-btn btn-q2" onclick="addToQuadrant(2)">🔵 Schedule</button>
+            <button class="quadrant-btn btn-q3" onclick="addToQuadrant(3)">🟡 Delegate</button>
+            <button class="quadrant-btn btn-q4" onclick="addToQuadrant(4)">⚫ Eliminate</button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn btn-primary" onclick="refreshMatrix()">🔄 Refresh Matrix</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear All</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number" id="totalItems">0</div>
+            <div class="stat-label">Total Items</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="urgentCount">0</div>
+            <div class="stat-label">Urgent</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="importantCount">0</div>
+            <div class="stat-label">Important</div>
+        </div>
+    </div>
+
+    <div class="matrix-container">
+        <div class="quadrant urgent-important">
+            <h4>DO FIRST<br>Urgent + Important</h4>
+            <div id="quadrant1" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant not-urgent-important">
+            <h4>SCHEDULE<br>Not Urgent + Important</h4>
+            <div id="quadrant2" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant urgent-not-important">
+            <h4>DELEGATE<br>Urgent + Not Important</h4>
+            <div id="quadrant3" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant not-urgent-not-important">
+            <h4>ELIMINATE<br>Not Urgent + Not Important</h4>
+            <div id="quadrant4" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let matrixManager = null;
+        let currentEmailItem = null;
+
+        // Initialize Office.js
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                matrixManager = new MatrixManager();
+                initialize();
+            }
+        });
+
+        async function initialize() {
+            try {
+                await loadMatrixData();
+                await loadCurrentItem();
+                renderMatrix();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('Error initializing add-in');
+            }
+        }
+
+        async function loadCurrentItem() {
+            try {
+                const item = Office.context.mailbox.item;
+                if (!item) return;
+
+                currentEmailItem = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.displayName || item.from.emailAddress : 'Unknown',
+                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : new Date().toLocaleDateString(),
+                    id: item.itemId || item.conversationId || generateId(),
+                    type: item.itemType || 'message'
+                };
+
+                document.getElementById('currentItem').style.display = 'block';
+                document.getElementById('itemTitle').textContent = currentEmailItem.subject;
+                document.getElementById('itemSender').textContent = `From: ${currentEmailItem.sender} • ${currentEmailItem.date}`;
+            } catch (error) {
+                console.error('Error loading current item:', error);
+            }
+        }
+
+        async function addToQuadrant(quadrantNumber) {
+            if (!currentEmailItem || !matrixManager) {
+                showToast('No email selected');
+                return;
+            }
+
+            const success = matrixManager.addItem(quadrantNumber, currentEmailItem);
+
+            if (success) {
+                await saveMatrixData();
+                renderMatrix();
+
+                const quadrantNames = ['', 'Do First', 'Schedule', 'Delegate', 'Eliminate'];
+                showToast(`Added to "${quadrantNames[quadrantNumber]}"`);
+            } else {
+                showToast('Error adding item');
+            }
+        }
+
+        function renderMatrix() {
+            if (!matrixManager) return;
+
+            const data = matrixManager.getData();
+
+            for (let q = 1; q <= 4; q++) {
+                const container = document.getElementById(`quadrant${q}`);
+                const items = data[q] || [];
+
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No items yet</div>';
+                } else {
+                    container.innerHTML = items.map(item =>
+                        `<div class="item" onclick="removeItem(${q}, '${escapeHtml(item.id)}')">
+                            <div class="item-title">${escapeHtml(item.subject || 'No Subject')}</div>
+                            <div class="item-date">${escapeHtml(item.sender)} • ${item.date}</div>
+                        </div>`
+                    ).join('');
+                }
+            }
+
+            updateStats();
+        }
+
+        function updateStats() {
+            if (!matrixManager) return;
+
+            const stats = matrixManager.getStats();
+            const urgent = stats.byQuadrant[1] + stats.byQuadrant[3];
+            const important = stats.byQuadrant[1] + stats.byQuadrant[2];
+
+            document.getElementById('totalItems').textContent = stats.total;
+            document.getElementById('urgentCount').textContent = urgent;
+            document.getElementById('importantCount').textContent = important;
+        }
+
+        function removeItem(quadrant, itemId) {
+            if (!matrixManager) return;
+
+            if (confirm('Remove this item from the matrix?')) {
+                const success = matrixManager.removeItem(quadrant, itemId);
+
+                if (success) {
+                    saveMatrixData();
+                    renderMatrix();
+                    showToast('Item removed');
+                }
+            }
+        }
+
+        async function refreshMatrix() {
+            showToast('Refreshing...');
+            await loadMatrixData();
+            renderMatrix();
+        }
+
+        async function clearAll() {
+            if (!matrixManager) return;
+
+            if (confirm('Clear all items from the matrix?')) {
+                matrixManager.clearAll();
+                await saveMatrixData();
+                renderMatrix();
+                showToast('Matrix cleared');
+            }
+        }
+
+        async function saveMatrixData() {
+            if (!matrixManager) return;
+
+            try {
+                const data = matrixManager.getData();
+
+                return new Promise((resolve, reject) => {
+                    if (Office.context.roamingSettings) {
+                        Office.context.roamingSettings.set('eisenhowerMatrix', JSON.stringify(data));
+                        Office.context.roamingSettings.saveAsync((result) => {
+                            if (result.status === Office.AsyncResultStatus.Succeeded) {
+                                resolve();
+                            } else {
+                                // Fallback to localStorage
+                                localStorage.setItem('eisenhowerMatrix', JSON.stringify(data));
+                                resolve();
+                            }
+                        });
+                    } else {
+                        localStorage.setItem('eisenhowerMatrix', JSON.stringify(data));
+                        resolve();
+                    }
+                });
+            } catch (error) {
+                console.error('Error saving matrix data:', error);
+                localStorage.setItem('eisenhowerMatrix', JSON.stringify(matrixManager.getData()));
+            }
+        }
+
+        async function loadMatrixData() {
+            if (!matrixManager) return;
+
+            try {
+                let data = null;
+
+                if (Office.context.roamingSettings) {
+                    const saved = Office.context.roamingSettings.get('eisenhowerMatrix');
+                    if (saved) {
+                        data = JSON.parse(saved);
+                    }
+                }
+
+                // Fallback to localStorage
+                if (!data) {
+                    const saved = localStorage.getItem('eisenhowerMatrix');
+                    if (saved) {
+                        data = JSON.parse(saved);
+                    }
+                }
+
+                if (data) {
+                    matrixManager.loadData(data);
+                }
+            } catch (error) {
+                console.error('Error loading matrix data:', error);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,33 +1,44 @@
-# Eisenhower Matrix for Outlook
+# Eisenhower Matrix for Outlook & Gmail
 
-A free Outlook add-in that helps you organize emails and tasks using the famous Eisenhower Matrix productivity method. Categorize items by urgency and importance to boost your productivity.
+A free email add-in that helps you organize emails and tasks using the famous Eisenhower Matrix productivity method. Categorize items by urgency and importance to boost your productivity.
 
-![Eisenhower Matrix](https://via.placeholder.com/600x400/0078d4/white?text=Eisenhower+Matrix+for+Outlook)
+**Now supports both Outlook and Gmail!**
 
-## 🚀 Features
+![Eisenhower Matrix](https://via.placeholder.com/600x400/0078d4/white?text=Eisenhower+Matrix)
 
+## Features
+
+- **Multi-Platform**: Works in both Outlook and Gmail
 - **Four Quadrants**: Organize emails into Do First, Schedule, Delegate, and Eliminate categories
 - **Visual Matrix**: See all your categorized items in a clean, color-coded interface
-- **Cross-Device Sync**: Your matrix data syncs across all devices with Office 365
+- **Cross-Device Sync**: Your matrix data syncs across all devices (Office 365 for Outlook, Google Properties for Gmail)
 - **Easy Management**: Click to remove items, refresh matrix, or clear all
-- **Professional Design**: Matches Outlook's interface for seamless integration
+- **Professional Design**: Matches your email client's interface for seamless integration
 
 ## 📥 Installation
 
-### Option 1: Direct Sideload (Recommended)
-1. **Download the manifest**: Right-click [manifest.xml](https://YOUR_GITHUB_USERNAME.github.io/eisenhower-matrix-addin/manifest.xml) and save it to your computer
-2. **Open Outlook** (desktop or web)
-3. **Install the add-in**:
-   - **Outlook Desktop**: Go to **File** → **Get Add-ins** → **My add-ins** → **Add a custom add-in** → **Add from file**
-   - **Outlook Web**: Click the **Settings gear** → **View all Outlook settings** → **General** → **Manage add-ins** → **Add a custom add-in** → **Add from file**
-4. **Upload** the manifest.xml file
-5. **Start using**: Open any email and look for the "Open Matrix" button in the ribbon!
+### 🚀 Quick Install (Recommended)
 
-### Option 2: From Repository
-1. Download or clone this repository
-2. Follow the sideload instructions above with the manifest.xml file
+Visit our **[One-Click Installer](https://shaia.github.io/eisenhower-matrix-addin/install.html)** for the easiest setup!
 
-## 🎯 How to Use
+### Manual Installation
+
+**For Outlook:**
+1. Download [manifest.xml](https://shaia.github.io/eisenhower-matrix-addin/manifest.xml)
+2. Open Outlook → Settings → Get Add-ins → My add-ins → Add custom add-in → Add from file
+3. Upload the manifest.xml file
+
+**For Gmail:**
+1. Go to [script.google.com](https://script.google.com)
+2. Create a new project
+3. Copy contents of `gmail-addon.js` and `appsscript.json`
+4. Deploy → Test deployments → Install
+
+📖 **Detailed guides:**
+- [Installation Guide](INSTALLATION.md)
+- [Easy Deployment Options](EASY_DEPLOYMENT.md) - Marketplace publishing, admin deployment, etc.
+
+## How to Use
 
 1. **Open an Email**: Select any email in Outlook
 2. **Click "Open Matrix"**: Find the button in the Outlook ribbon
@@ -39,14 +50,7 @@ A free Outlook add-in that helps you organize emails and tasks using the famous 
 4. **View Matrix**: See all your categorized items in the visual matrix
 5. **Manage Items**: Click on any item to remove it from the matrix
 
-## 🛠️ Technical Details
-
-- **Technology**: HTML, CSS, JavaScript with Office.js API
-- **Storage**: Uses Office roaming settings for cross-device sync
-- **Compatibility**: Works with Outlook 2016+, Outlook on the web, Outlook mobile
-- **Hosting**: GitHub Pages (free, reliable, HTTPS)
-
-## 📱 Screenshots
+## Screenshots
 
 ### Matrix View
 The main interface showing all four quadrants with categorized emails:
@@ -95,7 +99,7 @@ eisenhower-matrix-addin/
 └── LICENSE              # MIT License
 ```
 
-## ❓ Troubleshooting
+##Troubleshooting
 
 **Add-in doesn't appear in Outlook:**
 - Make sure you uploaded the correct manifest.xml file
@@ -125,7 +129,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. Some ideas
 - [ ] Bulk email categorization
 - [ ] Analytics and reporting
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

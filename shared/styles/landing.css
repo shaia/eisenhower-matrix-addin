@@ -1,0 +1,152 @@
+/**
+ * Landing Page Styles for Eisenhower Matrix
+ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    padding: 50px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin: 0;
+}
+
+.container {
+    background: rgba(255,255,255,0.1);
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 700px;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+}
+
+h1 {
+    color: #fff;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    opacity: 0.95;
+}
+
+.status {
+    background: #27ae60;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 25px 0;
+    font-weight: 600;
+}
+
+.platform-badges {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: rgba(255,255,255,0.25);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.install-btn {
+    display: inline-block;
+    background: #0078d4;
+    color: white;
+    padding: 18px 40px;
+    text-decoration: none;
+    border-radius: 10px;
+    margin: 30px 10px 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.install-btn:hover {
+    background: #005a9e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.links {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.links a {
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 8px;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.links a:hover {
+    background: rgba(255,255,255,0.35);
+    transform: translateY(-2px);
+}
+
+.features {
+    text-align: left;
+    margin: 30px auto;
+    max-width: 500px;
+}
+
+.features h3 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.features ul {
+    list-style: none;
+    padding: 0;
+}
+
+.features li {
+    padding: 8px 0;
+    padding-left: 30px;
+    position: relative;
+}
+
+.features li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.footer {
+    margin-top: 40px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    .tagline {
+        font-size: 1.1em;
+    }
+
+    .install-btn {
+        display: block;
+        margin: 15px auto;
+    }
+}

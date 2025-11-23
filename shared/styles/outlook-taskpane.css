@@ -1,0 +1,332 @@
+/**
+ * Outlook Task Pane Styles
+ * Microsoft Fluent Design System
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    padding: 16px;
+    background-color: #faf9f8;
+    color: #323130;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #edebe9;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #323130;
+    margin-bottom: 4px;
+}
+
+.header p {
+    font-size: 13px;
+    color: #605e5c;
+}
+
+/* Current Item Card */
+.current-item {
+    background: white;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132), 0 0.3px 0.9px rgba(0,0,0,0.108);
+    border-left: 4px solid #0078d4;
+}
+
+.current-item h3 {
+    margin: 0 0 8px 0;
+    color: #0078d4;
+    font-size: 15px;
+    font-weight: 600;
+    word-wrap: break-word;
+}
+
+.current-item p {
+    margin: 0;
+    font-size: 12px;
+    color: #605e5c;
+}
+
+.quadrant-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.quadrant-btn {
+    padding: 10px 8px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.1s ease;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.quadrant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.quadrant-btn:active {
+    transform: translateY(0);
+}
+
+.btn-q1 { background: #d13438; }
+.btn-q1:hover { background: #a4262c; }
+
+.btn-q2 { background: #0078d4; }
+.btn-q2:hover { background: #106ebe; }
+
+.btn-q3 { background: #ffaa44; }
+.btn-q3:hover { background: #f7630c; }
+
+.btn-q4 { background: #8a8886; }
+.btn-q4:hover { background: #605e5c; }
+
+/* Action Buttons */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.1s ease;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.btn-primary {
+    background: #0078d4;
+    color: white;
+    border-color: #0078d4;
+}
+
+.btn-primary:hover {
+    background: #106ebe;
+    border-color: #106ebe;
+}
+
+.btn-secondary {
+    background: white;
+    color: #323130;
+}
+
+.btn-secondary:hover {
+    background: #f3f2f1;
+}
+
+/* Matrix Container */
+.matrix-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+    min-height: 400px;
+}
+
+.quadrant {
+    background: white;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132), 0 0.3px 0.9px rgba(0,0,0,0.108);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.quadrant h4 {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    border-radius: 2px;
+    color: white;
+}
+
+.urgent-important {
+    border-left: 3px solid #d13438;
+}
+.urgent-important h4 {
+    background-color: #d13438;
+}
+
+.not-urgent-important {
+    border-left: 3px solid #0078d4;
+}
+.not-urgent-important h4 {
+    background-color: #0078d4;
+}
+
+.urgent-not-important {
+    border-left: 3px solid #ffaa44;
+}
+.urgent-not-important h4 {
+    background-color: #ffaa44;
+}
+
+.not-urgent-not-important {
+    border-left: 3px solid #8a8886;
+}
+.not-urgent-not-important h4 {
+    background-color: #8a8886;
+}
+
+.quadrant-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Scrollbar Styling */
+.quadrant-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.quadrant-content::-webkit-scrollbar-track {
+    background: #f3f2f1;
+    border-radius: 4px;
+}
+
+.quadrant-content::-webkit-scrollbar-thumb {
+    background: #c8c6c4;
+    border-radius: 4px;
+}
+
+.quadrant-content::-webkit-scrollbar-thumb:hover {
+    background: #a19f9d;
+}
+
+.item {
+    background: #faf9f8;
+    margin: 0 0 8px 0;
+    padding: 10px;
+    border-radius: 2px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #edebe9;
+    transition: all 0.1s ease;
+}
+
+.item:hover {
+    background: #f3f2f1;
+    border-color: #c8c6c4;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.item-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #323130;
+    word-wrap: break-word;
+}
+
+.item-date {
+    color: #605e5c;
+    font-size: 11px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #a19f9d;
+    font-size: 12px;
+    font-style: italic;
+    padding: 40px 10px;
+}
+
+/* Stats Bar */
+.stats-bar {
+    background: white;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132);
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.stat {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0078d4;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #605e5c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #605e5c;
+}
+
+.spinner {
+    border: 3px solid #f3f2f1;
+    border-top: 3px solid #0078d4;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #323130;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 2px;
+    font-size: 13px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+}

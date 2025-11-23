@@ -1,73 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eisenhower Matrix Add-in - Test Page</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .container {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 { color: #fff; }
-        .links { margin-top: 20px; }
-        .links a { 
-            color: #fff; 
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 0 10px;
-            display: inline-block;
-        }
-        .links a:hover { background: rgba(255,255,255,0.3); }
-        .status { 
-            background: #27ae60; 
-            padding: 10px; 
-            border-radius: 5px; 
-            margin: 20px 0;
-        }
-    </style>
+    <title>Eisenhower Matrix - Email Productivity for Outlook & Gmail</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="shared/styles/landing.css">
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Eisenhower Matrix Add-in</h1>
-        
+        <h1>🎯 Eisenhower Matrix</h1>
+        <p class="tagline">Master Your Email with the Eisenhower Decision Matrix</p>
+
         <div class="status">
-            ✅ GitHub Pages is working correctly!
+            ✅ Now Supporting Both Outlook & Gmail!
         </div>
-        
-        <p>Your Outlook add-in files are hosted and ready to use.</p>
-        
+
+        <div class="platform-badges">
+            <span class="badge">📧 Outlook Desktop</span>
+            <span class="badge">🌐 Outlook Web</span>
+            <span class="badge">📬 Gmail</span>
+            <span class="badge">📱 Mobile Ready</span>
+        </div>
+
+        <a href="install.html" class="install-btn">
+            🚀 One-Click Install
+        </a>
+
+        <div class="features">
+            <h3>✨ Key Features</h3>
+            <ul>
+                <li>Organize emails by urgency & importance</li>
+                <li>Four-quadrant productivity matrix</li>
+                <li>Cross-device synchronization</li>
+                <li>Works in Outlook AND Gmail</li>
+                <li>Free & open-source</li>
+                <li>Privacy-focused (no data collection)</li>
+            </ul>
+        </div>
+
         <div class="links">
-            <a href="manifest.xml" target="_blank">📄 Download Manifest</a>
-            <a href="taskpane.html" target="_blank">🖥️ View Interface</a>
-            <a href="https://github.com/shaia/eisenhower-matrix-addin" target="_blank">📂 GitHub Repo</a>
+            <a href="install.html">📦 Easy Install</a>
+            <a href="docs/INSTALLATION.md" target="_blank">📖 Full Guide</a>
+            <a href="outlook/taskpane.html" target="_blank">👀 Preview Outlook UI</a>
+            <a href="https://github.com/shaia/eisenhower-matrix-addin" target="_blank">💻 GitHub</a>
         </div>
-        
-        <h2>📥 Installation Instructions:</h2>
-        <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
-            <li>Right-click the "Download Manifest" link above</li>
-            <li>Save the manifest.xml file to your computer</li>
-            <li>Open Outlook (desktop or web)</li>
-            <li>Go to Get Add-ins → My add-ins → Add custom add-in</li>
-            <li>Upload the manifest.xml file</li>
-            <li>Open any email and look for the "Open Matrix" button!</li>
-        </ol>
-        
-        <p style="margin-top: 30px; font-size: 12px; opacity: 0.8;">
-            Last updated: <span id="date"></span>
-        </p>
+
+        <div class="footer">
+            <p>Open Source • MIT License • Dedicated with ❤️ to Adi A.</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                Last updated: <span id="date"></span>
+            </p>
+        </div>
     </div>
-    
+
     <script>
         document.getElementById('date').textContent = new Date().toLocaleDateString();
     </script>

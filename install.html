@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Eisenhower Matrix - One-Click Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .platform-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .platform-card {
+            border: 3px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .platform-card.outlook {
+            border-color: #0078d4;
+        }
+
+        .platform-card.outlook:hover {
+            background: #f0f8ff;
+        }
+
+        .platform-card.gmail {
+            border-color: #ea4335;
+        }
+
+        .platform-card.gmail:hover {
+            background: #fff5f5;
+        }
+
+        .platform-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .platform-card h2 {
+            margin-bottom: 10px;
+            color: #323130;
+        }
+
+        .platform-card p {
+            color: #605e5c;
+            margin-bottom: 20px;
+        }
+
+        .install-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+
+        .install-btn.outlook {
+            background: #0078d4;
+        }
+
+        .install-btn.outlook:hover {
+            background: #005a9e;
+        }
+
+        .install-btn.gmail {
+            background: #ea4335;
+        }
+
+        .install-btn.gmail:hover {
+            background: #c5221f;
+        }
+
+        .features {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .features h3 {
+            margin-bottom: 15px;
+            color: #323130;
+        }
+
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #605e5c;
+        }
+
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #107c10;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .instructions.show {
+            display: block;
+        }
+
+        .instructions h4 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 30px;
+            border-top: 2px solid #e1e5e9;
+            margin-top: 30px;
+        }
+
+        .qr-section p {
+            color: #605e5c;
+            margin-bottom: 15px;
+        }
+
+        .qr-code {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .platform-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Eisenhower Matrix</h1>
+            <p>One-Click Installation for Outlook & Gmail</p>
+        </div>
+
+        <div class="content">
+            <div class="platform-selector">
+                <!-- Outlook Card -->
+                <div class="platform-card outlook" onclick="showOutlookInstructions()">
+                    <div class="platform-icon">📧</div>
+                    <h2>Microsoft Outlook</h2>
+                    <p>Works on Desktop, Web & Mobile</p>
+                    <button class="install-btn outlook" onclick="installOutlook(event)">
+                        Install for Outlook
+                    </button>
+                </div>
+
+                <!-- Gmail Card -->
+                <div class="platform-card gmail" onclick="showGmailInstructions()">
+                    <div class="platform-icon">📬</div>
+                    <h2>Google Gmail</h2>
+                    <p>Works on Web & Mobile</p>
+                    <button class="install-btn gmail" onclick="installGmail(event)">
+                        Install for Gmail
+                    </button>
+                </div>
+            </div>
+
+            <!-- Outlook Instructions -->
+            <div id="outlookInstructions" class="instructions">
+                <h4>📧 Outlook Installation Steps:</h4>
+                <ol>
+                    <li>The manifest.xml file will download automatically</li>
+                    <li>Open Outlook (Desktop or Web)</li>
+                    <li>Go to: <strong>Settings → Get Add-ins → My add-ins → Add a custom add-in → Add from file</strong></li>
+                    <li>Upload the downloaded manifest.xml file</li>
+                    <li>Open any email and look for the "Matrix" button!</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>Alternative:</strong> <a href="INSTALLATION.md" target="_blank">View detailed guide</a></p>
+            </div>
+
+            <!-- Gmail Instructions -->
+            <div id="gmailInstructions" class="instructions">
+                <h4>📬 Gmail Installation Steps:</h4>
+                <ol>
+                    <li>You'll be redirected to Google Apps Script</li>
+                    <li>Create a new project</li>
+                    <li>Copy the code from our repository</li>
+                    <li>Deploy as a test deployment</li>
+                    <li>Grant permissions when prompted</li>
+                    <li>Open Gmail and look for Eisenhower Matrix in the sidebar!</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>Need help?</strong> <a href="INSTALLATION.md" target="_blank">View detailed guide</a></p>
+            </div>
+
+            <div class="features">
+                <h3>✨ What You Get:</h3>
+                <ul>
+                    <li>Four-quadrant matrix for organizing emails</li>
+                    <li>Categorize by urgency and importance</li>
+                    <li>Cross-device sync (Office 365 or Google)</li>
+                    <li>Clean, professional interface</li>
+                    <li>Free and open-source</li>
+                    <li>Regular updates and improvements</li>
+                </ul>
+            </div>
+
+            <div class="qr-section">
+                <p><strong>📱 Install on Mobile?</strong></p>
+                <p>Scan this QR code with your phone:</p>
+                <div class="qr-code">
+                    <canvas id="qrcode"></canvas>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Opens this page on your mobile device
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+    <script>
+        // Get the base URL
+        const baseUrl = window.location.origin + window.location.pathname.replace('install.html', '');
+
+        // Generate QR code for mobile installation
+        QRCode.toCanvas(document.getElementById('qrcode'), window.location.href, {
+            width: 200,
+            margin: 2,
+            color: {
+                dark: '#0078d4',
+                light: '#ffffff'
+            }
+        });
+
+        function installOutlook(event) {
+            event.stopPropagation();
+
+            // Download manifest.xml
+            const manifestUrl = baseUrl + 'manifest.xml';
+
+            // Create a temporary link to download
+            const link = document.createElement('a');
+            link.href = manifestUrl;
+            link.download = 'eisenhower-matrix-manifest.xml';
+            link.click();
+
+            // Show instructions
+            showOutlookInstructions();
+
+            // Optional: Try to open Outlook add-in installation (only works in some browsers)
+            setTimeout(() => {
+                try {
+                    window.location.href = `ms-word:ofv|u|${manifestUrl}`;
+                } catch (e) {
+                    console.log('Direct installation not supported in this browser');
+                }
+            }, 1000);
+        }
+
+        function installGmail(event) {
+            event.stopPropagation();
+
+            // Show instructions
+            showGmailInstructions();
+
+            // Open Google Apps Script in new tab
+            setTimeout(() => {
+                const githubUrl = 'https://github.com/shaia/eisenhower-matrix-addin';
+                window.open(githubUrl + '#gmail-installation', '_blank');
+            }, 500);
+        }
+
+        function showOutlookInstructions() {
+            const outlookInstr = document.getElementById('outlookInstructions');
+            const gmailInstr = document.getElementById('gmailInstructions');
+
+            outlookInstr.classList.add('show');
+            gmailInstr.classList.remove('show');
+        }
+
+        function showGmailInstructions() {
+            const outlookInstr = document.getElementById('outlookInstructions');
+            const gmailInstr = document.getElementById('gmailInstructions');
+
+            gmailInstr.classList.add('show');
+            outlookInstr.classList.remove('show');
+        }
+
+        // Analytics (optional - add your tracking)
+        function trackInstallClick(platform) {
+            console.log(`User clicked install for ${platform}`);
+            // Add your analytics code here (Google Analytics, etc.)
+        }
+    </script>
+</body>
+</html>

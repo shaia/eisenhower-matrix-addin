@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix - Gmail</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+            background: #ddd;
+            padding: 2px;
+        }
+
+        .quadrant {
+            background: white;
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        .quadrant-header {
+            font-weight: 600;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+        }
+
+        .quadrant-desc {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .q1 .quadrant-header { color: #d13438; border-color: #d13438; }
+        .q2 .quadrant-header { color: #0078d4; border-color: #0078d4; }
+        .q3 .quadrant-header { color: #ffaa44; border-color: #ffaa44; }
+        .q4 .quadrant-header { color: #8a8886; border-color: #8a8886; }
+
+        .item {
+            background: #f8f8f8;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid;
+        }
+
+        .q1 .item { border-left-color: #d13438; }
+        .q2 .item { border-left-color: #0078d4; }
+        .q3 .item { border-left-color: #ffaa44; }
+        .q4 .item { border-left-color: #8a8886; }
+
+        .item:hover {
+            transform: translateX(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .item-subject {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .item-meta {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f5f5f5;
+            border-top: 2px solid #ddd;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #0078d4;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .notice strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Eisenhower Matrix</h1>
+            <p>Organize tasks by urgency and importance</p>
+        </div>
+
+        <div class="notice">
+            <strong>Note:</strong> This is a standalone view. To add emails to quadrants, use the Gmail sidebar add-on.
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="urgentCount">0</div>
+                <div class="stat-label">Urgent</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="importantCount">0</div>
+                <div class="stat-label">Important</div>
+            </div>
+        </div>
+
+        <div class="matrix-grid">
+            <div class="quadrant q1">
+                <div class="quadrant-header">🔴 Do First</div>
+                <div class="quadrant-desc">Urgent + Important</div>
+                <div id="quadrant1" class="quadrant-items">
+                    <div class="empty-state">No items yet</div>
+                </div>
+            </div>
+
+            <div class="quadrant q2">
+                <div class="quadrant-header">🔵 Schedule</div>
+                <div class="quadrant-desc">Not Urgent + Important</div>
+                <div id="quadrant2" class="quadrant-items">
+                    <div class="empty-state">No items yet</div>
+                </div>
+            </div>
+
+            <div class="quadrant q3">
+                <div class="quadrant-header">🟡 Delegate</div>
+                <div class="quadrant-desc">Urgent + Not Important</div>
+                <div id="quadrant3" class="quadrant-items">
+                    <div class="empty-state">No items yet</div>
+                </div>
+            </div>
+
+            <div class="quadrant q4">
+                <div class="quadrant-header">⚫ Eliminate</div>
+                <div class="quadrant-desc">Not Urgent + Not Important</div>
+                <div id="quadrant4" class="quadrant-items">
+                    <div class="empty-state">No items yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load matrix data from localStorage (simulating the Gmail add-on storage)
+        function loadMatrix() {
+            // In a real scenario, this would sync with the Gmail add-on's PropertiesService
+            // For now, we'll use localStorage as a demo
+            const saved = localStorage.getItem('eisenhowerMatrix');
+
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    renderMatrix(data);
+                } catch (e) {
+                    console.error('Error loading matrix:', e);
+                    renderMatrix({ 1: [], 2: [], 3: [], 4: [] });
+                }
+            } else {
+                renderMatrix({ 1: [], 2: [], 3: [], 4: [] });
+            }
+        }
+
+        function renderMatrix(data) {
+            let totalCount = 0;
+            let urgentCount = 0;
+            let importantCount = 0;
+
+            for (let q = 1; q <= 4; q++) {
+                const container = document.getElementById(`quadrant${q}`);
+                const items = data[q] || [];
+
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No items yet</div>';
+                } else {
+                    container.innerHTML = items.map(item => `
+                        <div class="item">
+                            <div class="item-subject">${escapeHtml(item.subject)}</div>
+                            <div class="item-meta">
+                                From: ${escapeHtml(item.sender || 'Unknown')}<br>
+                                ${item.date || ''}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                totalCount += items.length;
+                if (q === 1 || q === 3) urgentCount += items.length;
+                if (q === 1 || q === 2) importantCount += items.length;
+            }
+
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('urgentCount').textContent = urgentCount;
+            document.getElementById('importantCount').textContent = importantCount;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load matrix on page load
+        loadMatrix();
+
+        // Refresh every 5 seconds
+        setInterval(loadMatrix, 5000);
+    </script>
+</body>
+</html>

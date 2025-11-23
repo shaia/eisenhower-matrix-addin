@@ -1,0 +1,62 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with subtle gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="80" height="80" fill="url(#bgGradient)" rx="8"/>
+  
+  <!-- Quadrant 1: Urgent + Important (Red) -->
+  <rect x="5" y="5" width="30" height="30" fill="#d83b01" rx="4"/>
+  
+  <!-- Quadrant 2: Not Urgent + Important (Blue) -->
+  <rect x="45" y="5" width="30" height="30" fill="#0078d4" rx="4"/>
+  
+  <!-- Quadrant 3: Urgent + Not Important (Orange) -->
+  <rect x="5" y="45" width="30" height="30" fill="#ffaa44" rx="4"/>
+  
+  <!-- Quadrant 4: Not Urgent + Not Important (Gray) -->
+  <rect x="45" y="45" width="30" height="30" fill="#767676" rx="4"/>
+  
+  <!-- Email/task items representation -->
+  <!-- Q1 items (multiple small rectangles representing emails) -->
+  <rect x="8" y="8" width="24" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="13" width="18" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="18" width="20" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="23" width="22" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="28" width="16" height="3" fill="white" opacity="0.95" rx="1"/>
+  
+  <!-- Q2 items -->
+  <rect x="48" y="8" width="24" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="48" y="13" width="20" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="48" y="18" width="18" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="48" y="23" width="22" height="3" fill="white" opacity="0.95" rx="1"/>
+  
+  <!-- Q3 items -->
+  <rect x="8" y="48" width="20" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="53" width="24" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="8" y="58" width="16" height="3" fill="white" opacity="0.95" rx="1"/>
+  
+  <!-- Q4 items -->
+  <rect x="48" y="50" width="18" height="3" fill="white" opacity="0.95" rx="1"/>
+  <rect x="48" y="55" width="14" height="3" fill="white" opacity="0.95" rx="1"/>
+  
+  <!-- Quadrant labels -->
+  <text x="20" y="39" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="bold">DO FIRST</text>
+  <text x="60" y="39" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="bold">SCHEDULE</text>
+  <text x="20" y="71" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="bold">DELEGATE</text>
+  <text x="60" y="71" text-anchor="middle" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="bold">ELIMINATE</text>
+  
+  <!-- Center dividing lines -->
+  <line x1="40" y1="5" x2="40" y2="75" stroke="#ffffff" stroke-width="2" opacity="0.3"/>
+  <line x1="5" y1="40" x2="75" y2="40" stroke="#ffffff" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Outer border -->
+  <rect x="2" y="2" width="76" height="76" fill="none" stroke="#e1e5e9" stroke-width="2" rx="8"/>
+  
+  <!-- Subtle inner shadow effect -->
+  <rect x="5" y="5" width="70" height="70" fill="none" stroke="#000000" stroke-width="1" opacity="0.05" rx="6"/>
+</svg>

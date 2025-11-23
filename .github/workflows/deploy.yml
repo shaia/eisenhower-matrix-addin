@@ -1,37 +1,147 @@
-name: Deploy to GitHub Pages
+name: Deploy Add-in
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Manifests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Validate Gmail Manifest
+      run: |
+        echo "Validating gmail/appsscript.json..."
+        if [ -f gmail/appsscript.json ]; then
+          node -e "JSON.parse(require('fs').readFileSync('gmail/appsscript.json', 'utf8'))"
+          echo "✅ Gmail manifest is valid JSON"
+        fi
+
+    - name: Check File Structure
+      run: |
+        echo "Checking required files..."
+        test -f outlook/manifest.xml && echo "✅ outlook/manifest.xml exists"
+        test -f outlook/taskpane.html && echo "✅ outlook/taskpane.html exists"
+        test -f gmail/addon.js && echo "✅ gmail/addon.js exists"
+        test -f gmail/appsscript.json && echo "✅ gmail/appsscript.json exists"
+        test -f shared/core/matrix-manager.js && echo "✅ shared/core/matrix-manager.js exists"
+
   deploy:
     runs-on: ubuntu-latest
-    
-    # Permissions needed for GitHub Pages
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    name: Deploy to GitHub Pages
+
     permissions:
       contents: read
       pages: write
       id-token: write
-    
-    # Allow only one concurrent deployment
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
-      
+
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: '.'
-        
+
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Display URLs
+      run: |
+        echo "🎉 Deployment successful!"
+        echo "📧 Outlook manifest: ${{ steps.deployment.outputs.page_url }}outlook/manifest.xml"
+        echo "🖥️ Outlook Taskpane: ${{ steps.deployment.outputs.page_url }}outlook/taskpane.html"
+        echo "📬 Gmail Standalone: ${{ steps.deployment.outputs.page_url }}gmail/standalone-matrix.html"
+        echo "📄 Installation: ${{ steps.deployment.outputs.page_url }}docs/INSTALLATION.md"
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]')
+    name: Create Release Package
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get version from manifest
+      id: get_version
+      run: |
+        VERSION=$(grep -oP '(?<=<Version>)[^<]+' outlook/manifest.xml)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "📦 Version: $VERSION"
+
+    - name: Create AppSource Package
+      run: |
+        mkdir -p release/appsource
+        cp outlook/manifest.xml release/appsource/
+        cp outlook/taskpane.html release/appsource/
+        cp outlook/commands.html release/appsource/
+        cp -r shared release/appsource/
+        cp README.md release/appsource/
+        echo "✅ AppSource package created"
+
+    - name: Create Gmail Package
+      run: |
+        mkdir -p release/gmail
+        cp gmail/addon.js release/gmail/Code.gs
+        cp gmail/matrix.html release/gmail/
+        cp gmail/appsscript.json release/gmail/
+        cp README.md release/gmail/
+        echo "✅ Gmail package created"
+
+    - name: Create ZIP archives
+      run: |
+        cd release/appsource && zip -r ../eisenhower-matrix-outlook-${{ steps.get_version.outputs.version }}.zip .
+        cd ../gmail && zip -r ../eisenhower-matrix-gmail-${{ steps.get_version.outputs.version }}.zip .
+        echo "✅ ZIP archives created"
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        name: Release ${{ steps.get_version.outputs.version }}
+        files: |
+          release/*.zip
+        body: |
+          ## Eisenhower Matrix v${{ steps.get_version.outputs.version }}
+
+          ### 📦 Installation Packages
+
+          **For Outlook:**
+          - Download `eisenhower-matrix-outlook-${{ steps.get_version.outputs.version }}.zip`
+          - Extract and sideload `manifest.xml`
+
+          **For Gmail:**
+          - Download `eisenhower-matrix-gmail-${{ steps.get_version.outputs.version }}.zip`
+          - Copy contents to Google Apps Script project
+
+          ### 🔗 Quick Links
+          - [Installation Guide](INSTALLATION.md)
+          - [Easy Deployment](EASY_DEPLOYMENT.md)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

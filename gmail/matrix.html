@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix - Gmail</title>
+    <base target="_top">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            padding: 16px;
+            background-color: #f8f9fa;
+            color: #202124;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        /* Current Email Card */
+        .current-email {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        .current-email h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a73e8;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .current-email p {
+            font-size: 13px;
+            color: #5f6368;
+            margin-bottom: 12px;
+        }
+
+        .quadrant-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .quadrant-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            transition: all 0.2s;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
+
+        .quadrant-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .quadrant-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-q1 { background: #ea4335; }
+        .btn-q1:hover { background: #d33426; }
+
+        .btn-q2 { background: #1a73e8; }
+        .btn-q2:hover { background: #1765cc; }
+
+        .btn-q3 { background: #fbbc04; }
+        .btn-q3:hover { background: #f9ab00; }
+
+        .btn-q4 { background: #5f6368; }
+        .btn-q4:hover { background: #4d5156; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .action-btn {
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            background: white;
+            color: #1a73e8;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
+        /* Matrix Grid */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .quadrant {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quadrant-header {
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .quadrant-header h4 {
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .quadrant-header p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .q1-header { background: #ea4335; }
+        .q2-header { background: #1a73e8; }
+        .q3-header { background: #fbbc04; }
+        .q4-header { background: #5f6368; }
+
+        .quadrant-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .matrix-item {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .matrix-item:hover {
+            background: #e8f0fe;
+            border-left-color: #1a73e8;
+        }
+
+        .matrix-item.q1:hover { border-left-color: #ea4335; }
+        .matrix-item.q2:hover { border-left-color: #1a73e8; }
+        .matrix-item.q3:hover { border-left-color: #fbbc04; }
+        .matrix-item.q4:hover { border-left-color: #5f6368; }
+
+        .item-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+
+        .item-meta {
+            font-size: 11px;
+            color: #5f6368;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #9aa0a6;
+            font-size: 12px;
+            padding: 40px 10px;
+            font-style: italic;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Eisenhower Matrix</h1>
+        <p>Organize by urgency & importance</p>
+    </div>
+
+    <div id="currentEmail" class="current-email" style="display: none;">
+        <h3 id="emailSubject"></h3>
+        <p id="emailMeta"></p>
+        <div class="quadrant-buttons">
+            <button class="quadrant-btn btn-q1" onclick="addToQuadrant(1)">
+                🔴 Do First
+            </button>
+            <button class="quadrant-btn btn-q2" onclick="addToQuadrant(2)">
+                🔵 Schedule
+            </button>
+            <button class="quadrant-btn btn-q3" onclick="addToQuadrant(3)">
+                🟡 Delegate
+            </button>
+            <button class="quadrant-btn btn-q4" onclick="addToQuadrant(4)">
+                ⚫ Eliminate
+            </button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="action-btn" onclick="refreshMatrix()">🔄 Refresh</button>
+        <button class="action-btn" onclick="clearAll()">🗑️ Clear All</button>
+    </div>
+
+    <div class="matrix-grid">
+        <div class="quadrant">
+            <div class="quadrant-header q1-header">
+                <h4>DO FIRST</h4>
+                <p>Urgent + Important</p>
+            </div>
+            <div id="q1" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant">
+            <div class="quadrant-header q2-header">
+                <h4>SCHEDULE</h4>
+                <p>Not Urgent + Important</p>
+            </div>
+            <div id="q2" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant">
+            <div class="quadrant-header q3-header">
+                <h4>DELEGATE</h4>
+                <p>Urgent + Not Important</p>
+            </div>
+            <div id="q3" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+
+        <div class="quadrant">
+            <div class="quadrant-header q4-header">
+                <h4>ELIMINATE</h4>
+                <p>Not Urgent + Not Important</p>
+            </div>
+            <div id="q4" class="quadrant-content">
+                <div class="empty-state">No items yet</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number" id="totalItems">0</div>
+            <div class="stat-label">Total Items</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="urgentCount">0</div>
+            <div class="stat-label">Urgent</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="importantCount">0</div>
+            <div class="stat-label">Important</div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentEmailData = null;
+
+        // Load current email and matrix data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentEmail();
+            loadMatrix();
+        });
+
+        function loadCurrentEmail() {
+            google.script.run
+                .withSuccessHandler(function(email) {
+                    if (email) {
+                        currentEmailData = email;
+                        document.getElementById('currentEmail').style.display = 'block';
+                        document.getElementById('emailSubject').textContent = email.subject || 'No Subject';
+                        document.getElementById('emailMeta').textContent = `From: ${email.sender} • ${email.date}`;
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading email:', error);
+                })
+                .getCurrentEmailData();
+        }
+
+        function loadMatrix() {
+            google.script.run
+                .withSuccessHandler(renderMatrix)
+                .withFailureHandler(function(error) {
+                    console.error('Error loading matrix:', error);
+                    showToast('Error loading matrix data');
+                })
+                .getMatrixData();
+        }
+
+        function addToQuadrant(quadrant) {
+            if (!currentEmailData) {
+                showToast('No email selected');
+                return;
+            }
+
+            google.script.run
+                .withSuccessHandler(function() {
+                    const quadrantNames = ['', 'Do First', 'Schedule', 'Delegate', 'Eliminate'];
+                    showToast(`Added to ${quadrantNames[quadrant]}`);
+                    loadMatrix();
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error adding to quadrant:', error);
+                    showToast('Error adding item');
+                })
+                .addEmailToQuadrant(quadrant, currentEmailData);
+        }
+
+        function renderMatrix(matrixData) {
+            for (let q = 1; q <= 4; q++) {
+                const container = document.getElementById(`q${q}`);
+                const items = matrixData[q] || [];
+
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No items yet</div>';
+                } else {
+                    container.innerHTML = items.map(item => `
+                        <div class="matrix-item q${q}" onclick="removeItem(${q}, '${escapeHtml(item.id)}')">
+                            <div class="item-title">${escapeHtml(item.subject || 'No Subject')}</div>
+                            <div class="item-meta">${escapeHtml(item.sender)} • ${item.date}</div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            updateStats(matrixData);
+        }
+
+        function updateStats(matrixData) {
+            const total = Object.values(matrixData).reduce((sum, items) => sum + items.length, 0);
+            const urgent = (matrixData[1]?.length || 0) + (matrixData[3]?.length || 0);
+            const important = (matrixData[1]?.length || 0) + (matrixData[2]?.length || 0);
+
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('urgentCount').textContent = urgent;
+            document.getElementById('importantCount').textContent = important;
+        }
+
+        function removeItem(quadrant, itemId) {
+            if (confirm('Remove this item from the matrix?')) {
+                google.script.run
+                    .withSuccessHandler(function() {
+                        showToast('Item removed');
+                        loadMatrix();
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error removing item:', error);
+                        showToast('Error removing item');
+                    })
+                    .removeItemFromQuadrant(quadrant, itemId);
+            }
+        }
+
+        function refreshMatrix() {
+            showToast('Refreshing...');
+            loadMatrix();
+        }
+
+        function clearAll() {
+            if (confirm('Clear all items from the matrix?')) {
+                google.script.run
+                    .withSuccessHandler(function() {
+                        showToast('Matrix cleared');
+                        loadMatrix();
+                    })
+                    .withFailureHandler(function(error) {
+                        console.error('Error clearing matrix:', error);
+                        showToast('Error clearing matrix');
+                    })
+                    .clearAllItems();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -7,7 +7,9 @@
     <title>Eisenhower Matrix</title>
     
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
-    
+    <script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+    <script src="email-adapter.js" type="text/javascript"></script>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -213,53 +215,79 @@
     <script>
         let matrixData = {
             1: [], // Urgent + Important
-            2: [], // Not Urgent + Important  
+            2: [], // Not Urgent + Important
             3: [], // Urgent + Not Important
             4: []  // Not Urgent + Not Important
         };
-        
+
         let currentEmailItem = null;
+        let emailAdapter = null;
 
-        Office.onReady((info) => {
-            if (info.host === Office.HostType.Outlook) {
-                loadMatrixData();
-                loadCurrentItem();
-            }
-        });
+        // Initialize the appropriate email platform adapter
+        async function initialize() {
+            try {
+                emailAdapter = new EmailAdapter();
+                await emailAdapter.initialize();
 
-        function loadCurrentItem() {
-            if (Office.context.mailbox.item) {
-                const item = Office.context.mailbox.item;
-                currentEmailItem = {
-                    subject: item.subject,
-                    sender: item.from ? item.from.displayName : 'Unknown',
-                    date: item.dateTimeCreated ? item.dateTimeCreated.toLocaleDateString() : 'Unknown',
-                    id: item.itemId || generateId(),
-                    type: item.itemType
-                };
-                
-                document.getElementById('currentItem').style.display = 'block';
-                document.getElementById('itemTitle').textContent = currentEmailItem.subject || 'No Subject';
-                document.getElementById('itemSender').textContent = `From: ${currentEmailItem.sender} • ${currentEmailItem.date}`;
+                console.log(`Initialized for platform: ${emailAdapter.getPlatformName()}`);
+
+                await loadMatrixData();
+                await loadCurrentItem();
+            } catch (error) {
+                console.error('Failed to initialize email adapter:', error);
+                // Show error to user
+                document.body.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #d83b01;">
+                        <h3>Initialization Error</h3>
+                        <p>Unable to detect email platform. Please ensure you're running this in Outlook or Gmail.</p>
+                        <p style="font-size: 12px; color: #666;">${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        function addToQuadrant(quadrantNumber) {
+        // Platform-agnostic initialization
+        if (typeof Office !== 'undefined' && Office.onReady) {
+            Office.onReady((info) => {
+                initialize();
+            });
+        } else {
+            // For Gmail or standalone testing
+            document.addEventListener('DOMContentLoaded', () => {
+                initialize();
+            });
+        }
+
+        async function loadCurrentItem() {
+            try {
+                currentEmailItem = await emailAdapter.getCurrentItem();
+
+                if (currentEmailItem) {
+                    document.getElementById('currentItem').style.display = 'block';
+                    document.getElementById('itemTitle').textContent = currentEmailItem.subject || 'No Subject';
+                    document.getElementById('itemSender').textContent = `From: ${currentEmailItem.sender} • ${currentEmailItem.date}`;
+                }
+            } catch (error) {
+                console.error('Error loading current item:', error);
+            }
+        }
+
+        async function addToQuadrant(quadrantNumber) {
             if (!currentEmailItem) return;
-            
+
             // Check if item already exists in any quadrant
             for (let q = 1; q <= 4; q++) {
                 matrixData[q] = matrixData[q].filter(item => item.id !== currentEmailItem.id);
             }
-            
+
             // Add to selected quadrant
             matrixData[quadrantNumber].push({...currentEmailItem});
-            
-            saveMatrixData();
+
+            await saveMatrixData();
             renderMatrix();
-            
+
             // Show confirmation
-            showNotification(`Added "${currentEmailItem.subject}" to quadrant ${quadrantNumber}`);
+            await emailAdapter.showNotification(`Added "${currentEmailItem.subject}" to quadrant ${quadrantNumber}`);
         }
 
         function renderMatrix() {
@@ -288,82 +316,46 @@
             }
         }
 
-        function refreshMatrix() {
-            loadMatrixData();
+        async function refreshMatrix() {
+            await loadMatrixData();
             renderMatrix();
-            showNotification('Matrix refreshed');
+            await emailAdapter.showNotification('Matrix refreshed');
         }
 
-        function clearAll() {
+        async function clearAll() {
             if (confirm('Clear all items from the matrix?')) {
                 matrixData = { 1: [], 2: [], 3: [], 4: [] };
-                saveMatrixData();
+                await saveMatrixData();
                 renderMatrix();
-                showNotification('Matrix cleared');
+                await emailAdapter.showNotification('Matrix cleared');
             }
         }
 
-        function saveMatrixData() {
+        async function saveMatrixData() {
             try {
-                // Save to Office settings (syncs across devices)
-                if (Office.context.roamingSettings) {
-                    Office.context.roamingSettings.set('eisenhowerMatrix', JSON.stringify(matrixData));
-                    Office.context.roamingSettings.saveAsync();
-                } else {
-                    // Fallback to localStorage for testing
-                    localStorage.setItem('eisenhowerMatrix', JSON.stringify(matrixData));
-                }
-            } catch (e) {
-                console.log('Could not save matrix data:', e);
-                // Fallback to localStorage
-                localStorage.setItem('eisenhowerMatrix', JSON.stringify(matrixData));
+                await emailAdapter.saveData('eisenhowerMatrix', matrixData);
+            } catch (error) {
+                console.error('Could not save matrix data:', error);
             }
         }
 
-        function loadMatrixData() {
+        async function loadMatrixData() {
             try {
-                // Load from Office settings first
-                if (Office.context.roamingSettings) {
-                    const saved = Office.context.roamingSettings.get('eisenhowerMatrix');
-                    if (saved) {
-                        matrixData = JSON.parse(saved);
-                    }
-                } else {
-                    // Fallback to localStorage
-                    const saved = localStorage.getItem('eisenhowerMatrix');
-                    if (saved) {
-                        matrixData = JSON.parse(saved);
-                    }
+                const saved = await emailAdapter.loadData('eisenhowerMatrix');
+                if (saved) {
+                    matrixData = saved;
                 }
                 renderMatrix();
-            } catch (e) {
-                console.log('Could not load matrix data:', e);
-                // Try localStorage as backup
-                try {
-                    const saved = localStorage.getItem('eisenhowerMatrix');
-                    if (saved) {
-                        matrixData = JSON.parse(saved);
-                    }
-                } catch (e2) {
-                    console.log('Could not load from localStorage either:', e2);
-                }
+            } catch (error) {
+                console.error('Could not load matrix data:', error);
                 renderMatrix();
             }
-        }
-
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function showNotification(message) {
-            // Simple notification - in production you might want something more sophisticated
-            console.log(message);
         }
     </script>
 </body>
