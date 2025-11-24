@@ -7,7 +7,7 @@
   "runtimeVersion": "V8",
   "gmail": {
     "name": "Eisenhower Matrix",
-    "logoUrl": "https://www.gstatic.com/images/branding/product/1x/gmail_48dp.png",
+    "logoUrl": "https://shaia.github.io/eisenhower-matrix-addin/shared/icons/icon-128.png",
     "primaryColor": "#0078d4",
     "secondaryColor": "#767676",
     "contextualTriggers": [

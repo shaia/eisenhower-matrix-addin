@@ -82,7 +82,7 @@ function getComposeAddOn(e) {
   const card = CardService.newCardBuilder()
     .setHeader(CardService.newCardHeader()
       .setTitle('Eisenhower Matrix')
-      .setImageUrl('https://shaia.github.io/eisenhower-matrix-addin/icons/icon-32.png'))
+      .setImageUrl('https://shaia.github.io/eisenhower-matrix-addin/shared/icons/icon-32.png'))
     .addSection(CardService.newCardSection()
       .addWidget(CardService.newTextParagraph()
         .setText('Open the full Eisenhower Matrix interface in a new window.'))
@@ -114,7 +114,7 @@ function createMatrixCardWithDetails(messageId, subject, sender) {
     .setHeader(CardService.newCardHeader()
       .setTitle('Eisenhower Matrix')
       .setSubtitle('Categorize by urgency and importance')
-      .setImageUrl('https://shaia.github.io/eisenhower-matrix-addin/icons/icon-32.png'))
+      .setImageUrl('https://shaia.github.io/eisenhower-matrix-addin/shared/icons/icon-32.png'))
 
     // Current message section
     .addSection(CardService.newCardSection()
@@ -170,19 +170,166 @@ function createMatrixCardWithDetails(messageId, subject, sender) {
 }
 
 /**
- * Open full matrix view - opens external web page
+ * Open full matrix view - shows a visual 2x2 matrix layout
  * @return {CardService.ActionResponse}
  */
 function openFullMatrixView() {
-  // Gmail add-ons can only open external URLs, not HtmlService content
-  // Open the hosted standalone matrix page
-  const url = 'https://shaia.github.io/eisenhower-matrix-addin/gmail/standalone-matrix.html';
+  const matrixData = getMatrixData();
+
+  // Calculate statistics
+  const total = (matrixData[1]?.length || 0) + (matrixData[2]?.length || 0) +
+                (matrixData[3]?.length || 0) + (matrixData[4]?.length || 0);
+  const urgent = (matrixData[1]?.length || 0) + (matrixData[3]?.length || 0);
+  const important = (matrixData[1]?.length || 0) + (matrixData[2]?.length || 0);
+
+  const card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader()
+      .setTitle('📊 Eisenhower Matrix')
+      .setSubtitle(`${total} emails categorized`));
+
+  // Statistics section at the top
+  const statsSection = CardService.newCardSection();
+  statsSection.addWidget(CardService.newDecoratedText()
+    .setText(`<b>${urgent}</b> Urgent  |  <b>${important}</b> Important  |  <b>${total}</b> Total`)
+    .setWrapText(false));
+  card.addSection(statsSection);
+
+  // URGENT ROW - Q1 and Q3
+  const urgentRow = CardService.newCardSection()
+    .setHeader('⏰ URGENT');
+
+  // Q1: Do First (Urgent + Important)
+  const q1Items = matrixData[1] || [];
+  urgentRow.addWidget(CardService.newDecoratedText()
+    .setTopLabel('🔴 DO FIRST')
+    .setText(`<b>${q1Items.length} emails</b> • Urgent + Important`)
+    .setWrapText(true)
+    .setButton(CardService.newTextButton()
+      .setText('View →')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('showQuadrantDetail')
+        .setParameters({ quadrant: '1' }))));
+
+  // Q3: Delegate (Urgent + Not Important)
+  const q3Items = matrixData[3] || [];
+  urgentRow.addWidget(CardService.newDecoratedText()
+    .setTopLabel('🟡 DELEGATE')
+    .setText(`<b>${q3Items.length} emails</b> • Urgent + Not Important`)
+    .setWrapText(true)
+    .setButton(CardService.newTextButton()
+      .setText('View →')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('showQuadrantDetail')
+        .setParameters({ quadrant: '3' }))));
+
+  card.addSection(urgentRow);
+
+  // NOT URGENT ROW - Q2 and Q4
+  const notUrgentRow = CardService.newCardSection()
+    .setHeader('📅 NOT URGENT');
+
+  // Q2: Schedule (Not Urgent + Important)
+  const q2Items = matrixData[2] || [];
+  notUrgentRow.addWidget(CardService.newDecoratedText()
+    .setTopLabel('🔵 SCHEDULE')
+    .setText(`<b>${q2Items.length} emails</b> • Not Urgent + Important`)
+    .setWrapText(true)
+    .setButton(CardService.newTextButton()
+      .setText('View →')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('showQuadrantDetail')
+        .setParameters({ quadrant: '2' }))));
+
+  // Q4: Eliminate (Not Urgent + Not Important)
+  const q4Items = matrixData[4] || [];
+  notUrgentRow.addWidget(CardService.newDecoratedText()
+    .setTopLabel('⚫ ELIMINATE')
+    .setText(`<b>${q4Items.length} emails</b> • Not Urgent + Not Important`)
+    .setWrapText(true)
+    .setButton(CardService.newTextButton()
+      .setText('View →')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('showQuadrantDetail')
+        .setParameters({ quadrant: '4' }))));
+
+  card.addSection(notUrgentRow);
+
+  // Footer with back button
+  card.setFixedFooter(CardService.newFixedFooter()
+    .setPrimaryButton(CardService.newTextButton()
+      .setText('← Back to Current Email')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('getContextualAddOn'))));
 
   return CardService.newActionResponseBuilder()
-    .setOpenLink(CardService.newOpenLink()
-      .setUrl(url)
-      .setOpenAs(CardService.OpenAs.OVERLAY)
-      .setOnClose(CardService.OnClose.RELOAD_ADD_ON))
+    .setNavigation(CardService.newNavigation()
+      .pushCard(card.build()))
+    .build();
+}
+
+/**
+ * Show details for a specific quadrant
+ * @param {Object} e - Event object with quadrant parameter
+ * @return {CardService.ActionResponse}
+ */
+function showQuadrantDetail(e) {
+  const quadrant = parseInt(e.parameters.quadrant);
+  const matrixData = getMatrixData();
+  const items = matrixData[quadrant] || [];
+
+  const quadrantInfo = {
+    1: { name: '🔴 Do First', desc: 'Urgent + Important', advice: 'Do these tasks immediately!', color: '#d83b01' },
+    2: { name: '🔵 Schedule', desc: 'Not Urgent + Important', advice: 'Plan time for these tasks', color: '#0078d4' },
+    3: { name: '🟡 Delegate', desc: 'Urgent + Not Important', advice: 'Can someone else do these?', color: '#ffaa44' },
+    4: { name: '⚫ Eliminate', desc: 'Not Urgent + Not Important', advice: 'Consider removing these', color: '#767676' }
+  };
+
+  const info = quadrantInfo[quadrant];
+  const card = CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader()
+      .setTitle(info.name)
+      .setSubtitle(`${items.length} emails • ${info.desc}`));
+
+  // Advice section
+  const adviceSection = CardService.newCardSection();
+  adviceSection.addWidget(CardService.newTextParagraph()
+    .setText(`<b>💡 ${info.advice}</b>`));
+  card.addSection(adviceSection);
+
+  // Show items
+  const itemsSection = CardService.newCardSection()
+    .setHeader('Emails in this quadrant');
+
+  if (items.length === 0) {
+    itemsSection.addWidget(CardService.newTextParagraph()
+      .setText('<i>No emails in this quadrant yet.</i>'));
+  } else {
+    // Show up to 10 emails
+    items.slice(0, 10).forEach(item => {
+      itemsSection.addWidget(CardService.newKeyValue()
+        .setTopLabel(item.subject || 'No Subject')
+        .setContent(`From: ${item.sender || 'Unknown'}`)
+        .setBottomLabel(item.date || '')
+        .setMultiline(true));
+    });
+
+    if (items.length > 10) {
+      itemsSection.addWidget(CardService.newTextParagraph()
+        .setText(`<i>... and ${items.length - 10} more emails</i>`));
+    }
+  }
+  card.addSection(itemsSection);
+
+  // Footer with back button
+  card.setFixedFooter(CardService.newFixedFooter()
+    .setPrimaryButton(CardService.newTextButton()
+      .setText('← Back to Matrix')
+      .setOnClickAction(CardService.newAction()
+        .setFunctionName('openFullMatrixView'))));
+
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation()
+      .pushCard(card.build()))
     .build();
 }
 
